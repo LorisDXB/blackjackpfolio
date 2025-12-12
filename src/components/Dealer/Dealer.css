@@ -1,0 +1,35 @@
+@reference 'tailwindcss';
+
+.dealer-main {
+    @apply absolute left-150 top-5 w-40 h-40 border-amber-400 border-2
+}
+
+.dealer-idle-anim {
+    animation: infinityCurve 3s linear infinite   
+}
+@keyframes infinityCurve {
+  0%   { transform: translateX(0px) translateY(0px); }
+  12.5% { transform: translateX(10px) translateY(-6px); }
+  25%  { transform: translateX(20px) translateY(0px); }
+  37.5% { transform: translateX(10px) translateY(6px); }
+  50%  { transform: translateX(0px) translateY(0px); }
+
+  /* second loop (mirror) */
+  62.5% { transform: translateX(-10px) translateY(-6px); }
+  75%   { transform: translateX(-20px) translateY(0px); }
+  87.5% { transform: translateX(-10px) translateY(6px); }
+  100%  { transform: translateX(0px) translateY(0px); }
+}
+
+
+.dealer-move-anim {
+  animation: goToTarget 1.5s ease forwards;
+}
+@keyframes goToTarget {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--target-x), var(--target-y));
+  }
+}

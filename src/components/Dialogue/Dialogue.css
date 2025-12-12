@@ -1,0 +1,5 @@
+@reference "tailwindcss";
+
+.dialogue-main {
+    @apply fixed top-4/10 flex justify-center items-center w-3/5 h-3/10 border-2 border-blue-400
+}
