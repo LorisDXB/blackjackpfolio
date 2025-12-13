@@ -18,28 +18,29 @@ function App() {
   }, []);
 
   useEffect(() => {
-      bj.blackjackTickGame();
-  }, [bj.dealerHand, bj.playerHand, bj.playerState, bj.dealerState]);
+    bj.blackjackTickGame();
+  }, [bj.dealerHand, bj.playerHand, bj.playerState, bj.dealerState, bj.dealerPlaying]);
 
   return (
     <div className='board-main'>
       {/* Dealer side */}
-      <div className='board-side'> 
+      <div className='board-side'>
         <Dealer ref={bj.dealerAnimator.dealerRef} />
         {bj.dealerHand.map((d: CardData, index) => (
-          <Card key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId}/>
+          <Card ref={bj.dealerAnimator.dealerSpotRef} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />
         ))}
       </div>
 
       {/* Player side */}
-      <div ref={bj.dealerAnimator.cardSpotRef} className='board-side'
+      <div className='board-side'
         onDoubleClick={bj.hitLogic}
         onMouseDown={bj.standLogicStart}
         onMouseUp={bj.standLogicEnd}>
         {bj.playerHand.map((d: CardData, index) => {
           const lastCard = index == bj.playerHand.length - 1;
 
-          return (<Card ref={lastCard ? bj.dealerAnimator.cardSpotRef : null} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />);
+          console.log("reloaded")
+          return (<Card ref={lastCard ? bj.dealerAnimator.playerSpotRef : null} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />);
         })}
       </div>
 

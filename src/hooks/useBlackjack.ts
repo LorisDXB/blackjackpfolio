@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useDealerAnimator } from './useDealerAnimation';
 import { sleep } from '../utility/utility';
 
@@ -15,15 +15,25 @@ export enum PlayerState {
 }
 
 export default function useBlackjack() {
-    const dealerAnimator = useDealerAnimator();
     //hands
     const [dealerHand, setDealerHand] = useState<CardData[]>([]);
     const [playerHand, setPlayerHand] = useState<CardData[]>([]);
     //playerstates
     const [dealerState, setDealerState] = useState<PlayerState>(PlayerState.NONE);
     const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.NONE);
+
     // gameStates
-    const dealerPlaying = useRef(false);
+    const [dealerPlaying, setDealerPlaying] = useState<boolean>(false);
+    const dealerAnimator = useDealerAnimator(dealerPlaying);
+
+    const [dealerAmount, setDealerAmount] = useState<number>(0);
+    const [playerAmount, setPlayerAmount] = useState<number>(0);
+
+    useEffect(() => {
+        if (!dealerPlaying) return;
+
+        startDealerLogic(dealerAmount, playerAmount);
+    }, [dealerPlaying])
 
     function generateCard(hiddenState: boolean) {
         return { hidden: hiddenState, typeId: Math.floor(Math.random() * 10) + 1 } as CardData
@@ -54,10 +64,14 @@ export default function useBlackjack() {
     }
 
     // hit logic
-    function hitLogic() {
+    async function hitLogic() {
         if (playerState != PlayerState.NONE) return;
 
-        dealerAnimator.playGiveCardAnimation(() => giveCard(setPlayerHand));
+        dealerAnimator.setDealerOccupied(true);
+        await dealerAnimator.playGiveCardAnimation();
+        giveCard(setPlayerHand)
+        await dealerAnimator.playReturnAnimation();
+        dealerAnimator.setDealerOccupied(false);
         console.log("hit");
     }
 
@@ -85,16 +99,24 @@ export default function useBlackjack() {
     }
 
     async function startDealerLogic(dealerAmount: number, playerAmount: number) {
+        console.log("moving", dealerAmount);
+        console.log("moving", playerAmount);
+        dealerAnimator.setDealerOccupied(true);
         setDealerHand(prev => {
             const newHand = [...prev];
             if (newHand[0]) newHand[0].hidden = false;
             return newHand;
         });
 
+        await dealerAnimator.playGiveCardAnimation(true);
         while (dealerAmount < playerAmount) {
-            dealerAmount += giveCard(setDealerHand);
+            dealerAmount += giveCard(setDealerHand)
             await sleep(500);
+            console.log("test");
         }
+        await dealerAnimator.playReturnAnimation(true);
+        dealerAnimator.playDefaultAnimation();
+        dealerAnimator.setDealerOccupied(false);
         if (dealerState != PlayerState.BUSTED)
             setDealerState(PlayerState.STANDING);
     }
@@ -103,9 +125,11 @@ export default function useBlackjack() {
         let dealerAmount = dealerHand.reduce((accumulator, d) => {
             return accumulator + d.typeId;
         }, 0);
+        setDealerAmount(dealerAmount);
         let playerAmount = playerHand.reduce((accumulator, d) => {
             return accumulator + d.typeId;
         }, 0);
+        setPlayerAmount(playerAmount);
 
         // check for busts
         if (dealerAmount > 21) {
@@ -128,9 +152,8 @@ export default function useBlackjack() {
         }
 
         // game continuation
-        if (playerState == PlayerState.STANDING && !dealerPlaying.current) {
-            dealerPlaying.current = true;
-            startDealerLogic(dealerAmount, playerAmount);
+        if (playerState == PlayerState.STANDING && !dealerPlaying) {
+            setDealerPlaying(true);
         }
 
         if (playerState == PlayerState.STANDING && dealerState == PlayerState.BUSTED) {
@@ -154,6 +177,7 @@ export default function useBlackjack() {
         standLogicStart,
         standLogicEnd,
         blackjackTickGame,
-        dealerAnimator
+        dealerAnimator,
+        dealerPlaying
     };
 }
