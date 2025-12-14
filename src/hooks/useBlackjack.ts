@@ -104,7 +104,6 @@ export default function useBlackjack() {
     async function startDealerLogic(dealerAmount: number, playerAmount: number) {
         console.log("moving", dealerAmount);
         console.log("moving", playerAmount);
-        await dealerDialogue.writeMessage("Alright, let's see if you made the right choice");
         dealerAnimator.setDealerOccupied(true);
         setDealerHand(prev => {
             const newHand = [...prev];
@@ -125,7 +124,7 @@ export default function useBlackjack() {
             setDealerState(PlayerState.STANDING);
     }
 
-    function blackjackTickGame() {
+    async function blackjackTickGame() {
         let dealerAmount = dealerHand.reduce((accumulator, d) => {
             return accumulator + d.typeId;
         }, 0);
@@ -139,33 +138,40 @@ export default function useBlackjack() {
         if (dealerAmount > 21) {
             console.log("dealerBust");
             setDealerState(PlayerState.BUSTED);
+            await dealerDialogue.writeMessage("DANG IT, I went over...")
         }
         if (playerAmount > 21) {
             console.log("playerBust");
             setPlayerState(PlayerState.BUSTED);
+            await dealerDialogue.writeMessage("Ahahah! How unfortunate, that's a bust.")
         }
 
         // check for win
         if (dealerAmount == 21) {
             console.log("dealerWin");
             setDealerState(PlayerState.WINNER);
+            await dealerDialogue.writeMessage("Looks like you're out of luck, blackjack.")
         }
         if (playerAmount == 21) {
             console.log("playerwin");
             setPlayerState(PlayerState.WINNER);
+            await dealerDialogue.writeMessage("BLACKJACK! Nice one.")
         }
 
         // game continuation
         if (playerState == PlayerState.STANDING && !dealerPlaying) {
+            await dealerDialogue.writeMessage("Alright, let's see if you made the right choice");
             setDealerPlaying(true);
         }
 
         if (playerState == PlayerState.STANDING && dealerState == PlayerState.BUSTED) {
             console.log("playerwin dealer busted");
             setDealerState(PlayerState.BUSTED);
+            await dealerDialogue.writeMessage("Well, looks like you beat me.")
         } else if (dealerState == PlayerState.STANDING) {
             console.log("playerlose dealer won")
             setPlayerState(PlayerState.WINNER);
+            await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
         }
     }
 
