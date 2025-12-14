@@ -23,6 +23,7 @@ function App() {
 
   return (
     <div className='board-main'>
+      {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut}/>}
       {/* Dealer side */}
       <div className='board-side'>
         <Dealer ref={bj.dealerAnimator.dealerRef} />
@@ -44,7 +45,6 @@ function App() {
         })}
       </div>
 
-      {/* <Dialogue dialogue={"Welcome"}/> */}
     </div>
   )
 }

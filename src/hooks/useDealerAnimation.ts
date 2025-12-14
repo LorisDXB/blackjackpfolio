@@ -16,6 +16,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     const playerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
     const dealerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
     const [dealerOccupied, setDealerOccupied] = useState<boolean>(false);
+    const lastTransform = useRef<{ dx: number; dy: number } | null>(null);
 
     useEffect(() => {
         playDefaultAnimation();
@@ -46,19 +47,16 @@ export function useDealerAnimator(dealerPlaying: boolean) {
             }
 
             const dealer = dealerRef.current;
-            const dealerRect = dealerRef.current.getBoundingClientRect();
-            const targetRect = cardSpotRef.getBoundingClientRect();
 
-            const dx = targetRect.left - dealerRect.left;
-            const dy = targetRect.top - dealerRect.top;
-
+            const t = lastTransform.current;
+            if (!t) return;
 
             dealer.animate(
-                [
-                    { transform: `translate(${dx}px, ${dy}px)` },
-                    { transform: "translate(0, 0)" }
-                ],
-                { duration: 800, easing: "ease", fill: forward ? "forwards" : "none" }
+              [
+                { transform: `translate(${t.dx}px, ${t.dy}px)` },
+                { transform: "translate(0, 0)" }
+              ],
+              { duration: 800, easing: "ease", fill: forward ? "forwards" : "none" }
             ).onfinish = () => {
                 if (forward)
                     clearAnimations();
@@ -84,6 +82,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
             const dx = targetRect.left - dealerRect.left;
             const dy = targetRect.top - dealerRect.top;
 
+            lastTransform.current = { dx, dy };
 
             setDealerOccupied(true);
             dealer.animate(

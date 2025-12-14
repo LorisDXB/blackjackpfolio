@@ -1,6 +1,7 @@
 import React, { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useDealerAnimator } from './useDealerAnimation';
 import { sleep } from '../utility/utility';
+import { useDialogue } from './useDialogue';
 
 export type CardData = {
     hidden: boolean;
@@ -15,6 +16,7 @@ export enum PlayerState {
 }
 
 export default function useBlackjack() {
+    const dealerDialogue = useDialogue();
     //hands
     const [dealerHand, setDealerHand] = useState<CardData[]>([]);
     const [playerHand, setPlayerHand] = useState<CardData[]>([]);
@@ -67,6 +69,7 @@ export default function useBlackjack() {
     async function hitLogic() {
         if (playerState != PlayerState.NONE) return;
 
+        await dealerDialogue.writeMessage("Hit ? Odd choice");
         dealerAnimator.setDealerOccupied(true);
         await dealerAnimator.playGiveCardAnimation();
         giveCard(setPlayerHand)
@@ -101,6 +104,7 @@ export default function useBlackjack() {
     async function startDealerLogic(dealerAmount: number, playerAmount: number) {
         console.log("moving", dealerAmount);
         console.log("moving", playerAmount);
+        await dealerDialogue.writeMessage("Alright, let's see if you made the right choice");
         dealerAnimator.setDealerOccupied(true);
         setDealerHand(prev => {
             const newHand = [...prev];
@@ -178,6 +182,7 @@ export default function useBlackjack() {
         standLogicEnd,
         blackjackTickGame,
         dealerAnimator,
-        dealerPlaying
+        dealerPlaying,
+        dealerDialogue
     };
 }
