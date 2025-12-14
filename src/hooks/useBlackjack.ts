@@ -31,11 +31,32 @@ export default function useBlackjack() {
     const [dealerAmount, setDealerAmount] = useState<number>(0);
     const [playerAmount, setPlayerAmount] = useState<number>(0);
 
+    const [resetToken, setResetToken] = useState<number>(0);
+
     useEffect(() => {
         if (!dealerPlaying) return;
 
         startDealerLogic(dealerAmount, playerAmount);
     }, [dealerPlaying])
+
+    useEffect(() => {
+        console.log(`resettoken ${resetToken}`);
+        resetGame();
+    }, [resetToken]);
+
+    function resetGame() {
+        setDealerHand([]);
+        setPlayerHand([]);
+        setDealerState(PlayerState.NONE);
+        setPlayerState(PlayerState.NONE);
+        setDealerPlaying(false);
+        setDealerAmount(0);
+        setPlayerAmount(0);
+        // dealerAnimator.resetAnimator();
+        // dealerDialogue.resetDialogue();
+        giveDealerHand();
+        givePlayerHand();
+    }
 
     function generateCard(hiddenState: boolean) {
         return { hidden: hiddenState, typeId: Math.floor(Math.random() * 10) + 1 } as CardData
@@ -137,25 +158,29 @@ export default function useBlackjack() {
         // check for busts
         if (dealerAmount > 21) {
             console.log("dealerBust");
-            setDealerState(PlayerState.BUSTED);
             await dealerDialogue.writeMessage("DANG IT, I went over...")
+            setDealerState(PlayerState.BUSTED);
+            setResetToken((d) => d + 1);
         }
         if (playerAmount > 21) {
             console.log("playerBust");
-            setPlayerState(PlayerState.BUSTED);
             await dealerDialogue.writeMessage("Ahahah! How unfortunate, that's a bust.")
+            setPlayerState(PlayerState.BUSTED);
+            setResetToken((d) => d + 1);
         }
 
         // check for win
         if (dealerAmount == 21) {
             console.log("dealerWin");
-            setDealerState(PlayerState.WINNER);
             await dealerDialogue.writeMessage("Looks like you're out of luck, blackjack.")
+            setDealerState(PlayerState.WINNER);
+            setResetToken((d) => d + 1);
         }
         if (playerAmount == 21) {
             console.log("playerwin");
-            setPlayerState(PlayerState.WINNER);
             await dealerDialogue.writeMessage("BLACKJACK! Nice one.")
+            setPlayerState(PlayerState.WINNER);
+            setResetToken((d) => d + 1);
         }
 
         // game continuation
@@ -165,13 +190,15 @@ export default function useBlackjack() {
         }
 
         if (playerState == PlayerState.STANDING && dealerState == PlayerState.BUSTED) {
-            console.log("playerwin dealer busted");
             setDealerState(PlayerState.BUSTED);
+            console.log("playerwin dealer busted");
             await dealerDialogue.writeMessage("Well, looks like you beat me.")
+            setResetToken((d) => d + 1);
         } else if (dealerState == PlayerState.STANDING) {
-            console.log("playerlose dealer won")
             setPlayerState(PlayerState.WINNER);
+            console.log("playerlose dealer won")
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
+            setResetToken((d) => d + 1);
         }
     }
 

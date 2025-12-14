@@ -15,6 +15,7 @@ export function useDialogue()
     function resetDialogue() {
         messageState.current = MessageState.NONE;
         setTypedOut("");
+        setHidden(true);
     }
 
     async function writeMessage(message: string) {
@@ -30,13 +31,13 @@ export function useDialogue()
                 await sleep(50);
         }
         await sleep(500);
-        setHidden(true)
         resetDialogue();
     }
 
     return {
         writeMessage,
         typedOut,
-        hidden
+        hidden,
+        resetDialogue
     };
 }

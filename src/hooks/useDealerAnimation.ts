@@ -22,6 +22,14 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         playDefaultAnimation();
     }, []);
 
+    function resetAnimator() {
+        dealerRef.current = null;
+        playerSpotRef.current = null;
+        dealerSpotRef.current = null;
+        setDealerOccupied(false);
+        lastTransform.current = null;
+    }
+
     function clearAnimations() {
         if (!dealerRef.current) return;
         cssDealerAnimationList.forEach((animToRemove) => {
@@ -105,6 +113,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         playReturnAnimation,
         setDealerOccupied,
         dealerSpotRef,
-        playerSpotRef
+        playerSpotRef,
+        resetAnimator
     }
 }

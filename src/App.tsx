@@ -7,15 +7,15 @@ import useBlackjack, { type CardData } from './hooks/useBlackjack'
 
 function App() {
   let bj = useBlackjack();
-  const initialHandGiven = useRef(false);
+  // const initialHandGiven = useRef(false);
 
-  useEffect(() => {
-    if (!initialHandGiven.current) {
-      bj.givePlayerHand();
-      bj.giveDealerHand();
-      initialHandGiven.current = true;
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!initialHandGiven.current) {
+  //     bj.givePlayerHand();
+  //     bj.giveDealerHand();
+  //     initialHandGiven.current = true;
+  //   }
+  // }, []);
 
   useEffect(() => {
     bj.blackjackTickGame();
