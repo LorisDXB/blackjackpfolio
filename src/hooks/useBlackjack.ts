@@ -26,23 +26,27 @@ export default function useBlackjack() {
 
     // gameStates
     const [dealerPlaying, setDealerPlaying] = useState<boolean>(false);
+    const dealerOccupied = useRef<boolean>(false);
     const dealerAnimator = useDealerAnimator(dealerPlaying);
 
     const [dealerAmount, setDealerAmount] = useState<number>(0);
     const [playerAmount, setPlayerAmount] = useState<number>(0);
 
-    const [resetToken, setResetToken] = useState<number>(0);
+  const initialHandGiven = useRef(false);
+
+  useEffect(() => {
+    if (!initialHandGiven.current) {
+      givePlayerHand();
+      giveDealerHand();
+      initialHandGiven.current = true;
+    }
+  }, []);
 
     useEffect(() => {
         if (!dealerPlaying) return;
 
         startDealerLogic(dealerAmount, playerAmount);
     }, [dealerPlaying])
-
-    useEffect(() => {
-        console.log(`resettoken ${resetToken}`);
-        resetGame();
-    }, [resetToken]);
 
     function resetGame() {
         setDealerHand([]);
@@ -52,10 +56,10 @@ export default function useBlackjack() {
         setDealerPlaying(false);
         setDealerAmount(0);
         setPlayerAmount(0);
-        // dealerAnimator.resetAnimator();
-        // dealerDialogue.resetDialogue();
         giveDealerHand();
         givePlayerHand();
+        dealerAnimator.resetAnimator();
+        dealerDialogue.resetDialogue();
     }
 
     function generateCard(hiddenState: boolean) {
@@ -66,7 +70,6 @@ export default function useBlackjack() {
         for (let i = 0; i < 2; i++) {
             let generatedCard = generateCard(false);
 
-            console.log(generatedCard);
             setPlayerHand((d: CardData[]) => [...d, generatedCard]);
         }
     }
@@ -88,15 +91,16 @@ export default function useBlackjack() {
 
     // hit logic
     async function hitLogic() {
-        if (playerState != PlayerState.NONE) return;
+        if (playerState != PlayerState.NONE || dealerOccupied.current) return;
 
+        dealerOccupied.current = true;
         await dealerDialogue.writeMessage("Hit ? Odd choice");
-        dealerAnimator.setDealerOccupied(true);
         await dealerAnimator.playGiveCardAnimation();
         giveCard(setPlayerHand)
+        dealerOccupied.current = false; // I put this here instead of after the return anim
+        // because it causes a bug where it sets dealerOccupied.false when the ticklogic needs it on
         await dealerAnimator.playReturnAnimation();
-        dealerAnimator.setDealerOccupied(false);
-        console.log("hit");
+        console.log("hit", dealerOccupied.current);
     }
 
     // stand logic
@@ -106,7 +110,6 @@ export default function useBlackjack() {
         if (playerState != PlayerState.NONE) return;
 
         let mousePos = e.clientX
-        console.log("stand start", mousePos);
 
         setStandPosXStart(mousePos);
     }
@@ -115,17 +118,13 @@ export default function useBlackjack() {
         if (standPosXStart < 0) return;
 
         let mousePos = e.clientX
-        console.log("stand end", mousePos);
 
-        if (Math.abs(standPosXStart - mousePos) >= 300) // 300 is minimum for it to be a stand (magic number though)
+        if (Math.abs(standPosXStart - mousePos) >= 300 && !dealerOccupied.current) // 300 is minimum for it to be a stand (magic number though)
             setPlayerState(PlayerState.STANDING);
         setStandPosXStart(-1); // Reset
     }
 
     async function startDealerLogic(dealerAmount: number, playerAmount: number) {
-        console.log("moving", dealerAmount);
-        console.log("moving", playerAmount);
-        dealerAnimator.setDealerOccupied(true);
         setDealerHand(prev => {
             const newHand = [...prev];
             if (newHand[0]) newHand[0].hidden = false;
@@ -136,11 +135,10 @@ export default function useBlackjack() {
         while (dealerAmount < playerAmount) {
             dealerAmount += giveCard(setDealerHand)
             await sleep(500);
-            console.log("test");
         }
         await dealerAnimator.playReturnAnimation(true);
         dealerAnimator.playDefaultAnimation();
-        dealerAnimator.setDealerOccupied(false);
+        dealerOccupied.current = false;
         if (dealerState != PlayerState.BUSTED)
             setDealerState(PlayerState.STANDING);
     }
@@ -157,48 +155,58 @@ export default function useBlackjack() {
 
         // check for busts
         if (dealerAmount > 21) {
-            console.log("dealerBust");
+            dealerOccupied.current = true;
             await dealerDialogue.writeMessage("DANG IT, I went over...")
             setDealerState(PlayerState.BUSTED);
-            setResetToken((d) => d + 1);
+            resetGame();
+            dealerOccupied.current = false;
         }
         if (playerAmount > 21) {
-            console.log("playerBust");
+            dealerOccupied.current = true;
+            console.log("TESTEST", dealerOccupied.current)
             await dealerDialogue.writeMessage("Ahahah! How unfortunate, that's a bust.")
             setPlayerState(PlayerState.BUSTED);
-            setResetToken((d) => d + 1);
+            resetGame();
+            dealerOccupied.current = false;
+            console.log("instant", dealerOccupied.current)
         }
 
         // check for win
         if (dealerAmount == 21) {
-            console.log("dealerWin");
+            dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, blackjack.")
             setDealerState(PlayerState.WINNER);
-            setResetToken((d) => d + 1);
+            resetGame();
+            dealerOccupied.current = false;
         }
         if (playerAmount == 21) {
-            console.log("playerwin");
+            dealerOccupied.current = true;
             await dealerDialogue.writeMessage("BLACKJACK! Nice one.")
             setPlayerState(PlayerState.WINNER);
-            setResetToken((d) => d + 1);
+            resetGame();
+            dealerOccupied.current = false;
         }
 
         // game continuation
-        if (playerState == PlayerState.STANDING && !dealerPlaying) {
+        if (playerState == PlayerState.STANDING && !dealerPlaying && !dealerOccupied.current) {
+            dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Alright, let's see if you made the right choice");
             setDealerPlaying(true);
+            dealerOccupied.current = false;
         }
 
         if (playerState == PlayerState.STANDING && dealerState == PlayerState.BUSTED) {
-            setDealerState(PlayerState.BUSTED);
-            console.log("playerwin dealer busted");
+            dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Well, looks like you beat me.")
-            setResetToken((d) => d + 1);
+            setDealerState(PlayerState.BUSTED);
+            resetGame();
+            dealerOccupied.current = false;
         } else if (dealerState == PlayerState.STANDING) {
-            setPlayerState(PlayerState.WINNER);
-            console.log("playerlose dealer won")
+            dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
-            setResetToken((d) => d + 1);
+            setPlayerState(PlayerState.WINNER);
+            resetGame();
+            dealerOccupied.current = false;
         }
     }
 

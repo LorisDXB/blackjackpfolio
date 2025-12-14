@@ -40,7 +40,6 @@ function App() {
         {bj.playerHand.map((d: CardData, index) => {
           const lastCard = index == bj.playerHand.length - 1;
 
-          console.log("reloaded")
           return (<Card ref={lastCard ? bj.dealerAnimator.playerSpotRef : null} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />);
         })}
       </div>

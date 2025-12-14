@@ -15,7 +15,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     const dealerRef = useRef<HTMLDivElement | null>(null); // set on init
     const playerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
     const dealerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
-    const [dealerOccupied, setDealerOccupied] = useState<boolean>(false);
+    // const dealerOccupied = useRef<boolean>(false);
     const lastTransform = useRef<{ dx: number; dy: number } | null>(null);
 
     useEffect(() => {
@@ -23,10 +23,10 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     }, []);
 
     function resetAnimator() {
-        dealerRef.current = null;
+        // dealerRef.current = null;
         playerSpotRef.current = null;
         dealerSpotRef.current = null;
-        setDealerOccupied(false);
+        // dealerOccupied.current = false;
         lastTransform.current = null;
     }
 
@@ -49,6 +49,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     function playReturnAnimation(forward?: boolean): Promise<null> {
         return new Promise(async (res) => {
             const cardSpotRef = dealerPlaying ? dealerSpotRef.current : playerSpotRef.current;
+            // if (!dealerRef.current || !cardSpotRef || dealerOccupied.current) {
             if (!dealerRef.current || !cardSpotRef) {
                 res(null);
                 return;
@@ -59,6 +60,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
             const t = lastTransform.current;
             if (!t) return;
 
+            // dealerOccupied.current = true;
             dealer.animate(
               [
                 { transform: `translate(${t.dx}px, ${t.dy}px)` },
@@ -68,6 +70,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
             ).onfinish = () => {
                 if (forward)
                     clearAnimations();
+                // dealerOccupied.current = false;
                 res(null);
             }
         });
@@ -76,13 +79,13 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     function playGiveCardAnimation(forward?: boolean): Promise<null> {
         return new Promise(async (res) => {
             const cardSpotRef = dealerPlaying ? dealerSpotRef.current : playerSpotRef.current;
-            if (!dealerRef.current || !cardSpotRef || dealerOccupied) {
+            // if (!dealerRef.current || !cardSpotRef || dealerOccupied.current) {
+            if (!dealerRef.current || !cardSpotRef) {
                 res(null);
                 return;
             }
 
             const dealer = dealerRef.current;
-            console.log(cardSpotRef);
 
             const dealerRect = dealerRef.current.getBoundingClientRect();
             const targetRect = cardSpotRef.getBoundingClientRect();
@@ -92,7 +95,8 @@ export function useDealerAnimator(dealerPlaying: boolean) {
 
             lastTransform.current = { dx, dy };
 
-            setDealerOccupied(true);
+            // dealerOccupied.current = true;
+
             dealer.animate(
                 [
                     { transform: "translate(0, 0)" },
@@ -101,6 +105,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
                 { duration: 800, easing: "ease", fill: forward ? "forwards" : "none" }
             ).onfinish = () => {
                 res(null);
+                // dealerOccupied.current = false;
                 return;
             };
         });
@@ -111,7 +116,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         playDefaultAnimation,
         playGiveCardAnimation,
         playReturnAnimation,
-        setDealerOccupied,
+        // dealerOccupied,
         dealerSpotRef,
         playerSpotRef,
         resetAnimator
