@@ -160,6 +160,7 @@ export default function useBlackjack() {
             setDealerState(PlayerState.BUSTED);
             resetGame();
             dealerOccupied.current = false;
+            return;
         }
         if (playerAmount > 21) {
             dealerOccupied.current = true;
@@ -169,6 +170,7 @@ export default function useBlackjack() {
             resetGame();
             dealerOccupied.current = false;
             console.log("instant", dealerOccupied.current)
+            return;
         }
 
         // check for win
@@ -178,6 +180,7 @@ export default function useBlackjack() {
             setDealerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
+            return;
         }
         if (playerAmount == 21) {
             dealerOccupied.current = true;
@@ -185,6 +188,7 @@ export default function useBlackjack() {
             setPlayerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
+            return;
         }
 
         // game continuation
@@ -193,15 +197,10 @@ export default function useBlackjack() {
             await dealerDialogue.writeMessage("Alright, let's see if you made the right choice");
             setDealerPlaying(true);
             dealerOccupied.current = false;
+            return;
         }
 
-        if (playerState == PlayerState.STANDING && dealerState == PlayerState.BUSTED) {
-            dealerOccupied.current = true;
-            await dealerDialogue.writeMessage("Well, looks like you beat me.")
-            setDealerState(PlayerState.BUSTED);
-            resetGame();
-            dealerOccupied.current = false;
-        } else if (dealerState == PlayerState.STANDING) {
+        if (dealerState == PlayerState.STANDING) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
             setPlayerState(PlayerState.WINNER);
