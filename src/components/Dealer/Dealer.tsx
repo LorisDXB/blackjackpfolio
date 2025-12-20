@@ -4,7 +4,7 @@ import "./Dealer.css"
 
 const Dealer = forwardRef<HTMLDivElement>((_, ref) => {
   return (
-    <div ref={ref} className="dealer-main">Dealer</div>
+    <div ref={ref} className="dealer-main"></div>
   )
 });
 

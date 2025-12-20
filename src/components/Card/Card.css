@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
 .card-main {
-    @apply flex flex-col items-center justify-center w-36 h-52 border-2 border-red-500 overflow-hidden bg-white select-none
+    @apply flex flex-col items-center justify-center w-36 h-52 overflow-hidden bg-white select-none
 }
 
 .card-img {
