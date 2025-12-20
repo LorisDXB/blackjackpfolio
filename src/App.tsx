@@ -19,7 +19,7 @@ function App() {
 
   useEffect(() => {
     bj.blackjackTickGame();
-  }, [bj.dealerHand, bj.playerHand, bj.playerState, bj.dealerState, bj.dealerPlaying]);
+  }, [bj.dealerHand, bj.playerHand, bj.playerState, bj.dealerPlaying]);
 
   return (
     <div className='board-main'>

@@ -100,7 +100,6 @@ export default function useBlackjack() {
         dealerOccupied.current = false; // I put this here instead of after the return anim
         // because it causes a bug where it sets dealerOccupied.false when the ticklogic needs it on
         await dealerAnimator.playReturnAnimation();
-        console.log("hit", dealerOccupied.current);
     }
 
     // stand logic
@@ -139,8 +138,10 @@ export default function useBlackjack() {
         await dealerAnimator.playReturnAnimation(true);
         dealerAnimator.playDefaultAnimation();
         dealerOccupied.current = false;
-        if (dealerState != PlayerState.BUSTED)
+        if (dealerState != PlayerState.BUSTED) {
             setDealerState(PlayerState.STANDING);
+        }
+        // setDealerPlaying(false);
     }
 
     async function blackjackTickGame() {
@@ -164,12 +165,10 @@ export default function useBlackjack() {
         }
         if (playerAmount > 21) {
             dealerOccupied.current = true;
-            console.log("TESTEST", dealerOccupied.current)
             await dealerDialogue.writeMessage("Ahahah! How unfortunate, that's a bust.")
             setPlayerState(PlayerState.BUSTED);
             resetGame();
             dealerOccupied.current = false;
-            console.log("instant", dealerOccupied.current)
             return;
         }
 
@@ -200,7 +199,8 @@ export default function useBlackjack() {
             return;
         }
 
-        if (dealerState == PlayerState.STANDING) {
+        // if (dealerState == PlayerState.STANDING) {
+        if (playerState == PlayerState.STANDING && !dealerOccupied.current && dealerAmount > playerAmount) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
             setPlayerState(PlayerState.WINNER);
