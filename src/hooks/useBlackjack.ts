@@ -27,6 +27,7 @@ export default function useBlackjack() {
     const [playerState, setPlayerState] = useState<PlayerState>(PlayerState.NONE);
 
     // gameStates
+    const [wonOnce, setWonOnce] = useState<boolean>(false);
     const [dealerPlaying, setDealerPlaying] = useState<boolean>(false);
     const dealerOccupied = useRef<boolean>(false);
     const dealerAnimator = useDealerAnimator(dealerPlaying);
@@ -156,6 +157,17 @@ export default function useBlackjack() {
         // setDealerPlaying(false);
     }
 
+    async function giveCv() {
+        if (wonOnce) return;
+
+        await dealerDialogue.writeMessage("Well, a deal is a deal, it's all yours.")
+        await dealerAnimator.playGiveCvAnimation();
+        dealerAnimator.grabDealer();
+        setWonOnce(true);
+        await dealerAnimator.playReturnAnimation();
+        await sleep(1000);
+    }
+
     async function blackjackTickGame() {
         if (dealerOccupied.current) return;
 
@@ -173,6 +185,7 @@ export default function useBlackjack() {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("DANG IT, I went over...")
             // setDealerState(PlayerState.BUSTED);
+            await giveCv();
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -199,6 +212,7 @@ export default function useBlackjack() {
         if (playerAmount == 21) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("BLACKJACK! Nice one.")
+            await giveCv();
             // setPlayerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
@@ -241,6 +255,7 @@ export default function useBlackjack() {
         dealerAnimator,
         dealerPlaying,
         dealerDialogue,
-        overlayAnimator
+        overlayAnimator,
+        wonOnce
     };
 }

@@ -30,6 +30,7 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     const dealerRef = useRef<HTMLDivElement | null>(null); // set on init
     const playerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
     const dealerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
+    const cvSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
     // const dealerOccupied = useRef<boolean>(false);
     const lastTransform = useRef<{ dx: number; dy: number } | null>(null);
     const twitchTimeout = useRef<number | null>(null);
@@ -128,6 +129,41 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         });
     }
 
+    function playGiveCvAnimation(forward?: boolean): Promise<null> {
+        return new Promise(async (res) => {
+            const elemRef = cvSpotRef.current;
+            // if (!dealerRef.current || !cardSpotRef || dealerOccupied.current) {
+            if (!dealerRef.current || !elemRef) {
+                res(null);
+                return;
+            }
+
+            const dealer = dealerRef.current;
+
+            const dealerRect = dealerRef.current.getBoundingClientRect();
+            const targetRect = elemRef.getBoundingClientRect();
+
+            const dx = targetRect.left - dealerRect.left;
+            const dy = targetRect.top - dealerRect.top;
+
+            lastTransform.current = { dx, dy };
+
+            // dealerOccupied.current = true;
+
+            dealer.animate(
+                [
+                    { transform: "translate(0, 0)" },
+                    { transform: `translate(${dx}px, ${dy}px)` }
+                ],
+                { duration: 800, easing: "ease", fill: forward ? "forwards" : "none" }
+            ).onfinish = () => {
+                res(null);
+                // dealerOccupied.current = false;
+                return;
+            };
+        });
+    }
+
     function setDealerImage(ref: React.RefObject<HTMLDivElement | null>, img: string) {
         if (!ref.current) return;
         ref.current.style.backgroundImage = `url(${img})`;
@@ -181,8 +217,10 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         playDefaultAnimation,
         playGiveCardAnimation,
         playReturnAnimation,
+        playGiveCvAnimation,
         // dealerOccupied,
         dealerSpotRef,
+        cvSpotRef,
         playerSpotRef,
         resetAnimator,
         grabDealer,

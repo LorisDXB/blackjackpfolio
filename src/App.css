@@ -5,5 +5,5 @@
 }
 
 .board-side {
-    @apply flex gap-5 justify-center items-center w-full h-1/3 border-2 border-pink-500
+    @apply flex gap-5 justify-center items-center w-full h-1/3 border-2 border-green-700
 }

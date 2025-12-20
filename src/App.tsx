@@ -17,17 +17,18 @@ function App() {
   return (
     <div className='board-main'>
       <Overlay ref={bj.overlayAnimator.overlayRef}/>
+      <Dealer ref={bj.dealerAnimator.dealerRef} />
       {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut}/>}
       {/* Dealer side */}
       <div className='board-side'>
-        <Dealer ref={bj.dealerAnimator.dealerRef} />
         {bj.dealerHand.map((d: CardData, index) => (
           <Card ref={bj.dealerAnimator.dealerSpotRef} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />
         ))}
       </div>
 
       <div className='board-side'>
-        <CvCard />
+        {bj.wonOnce ? (<CvCard />) : (<div ref={bj.dealerAnimator.cvSpotRef}
+          className='w-20 h-20 border border-red-500 rotate-45'></div>)}
       </div>
 
       {/* Player side */}

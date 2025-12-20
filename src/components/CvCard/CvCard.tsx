@@ -53,18 +53,18 @@ const CvCard = () => {
         <div className="pointer-events-auto">
           {scaledUp && (
             <div
-              className="fixed inset-0 z-40"
+              className="fixed inset-0 z-5"
               onClick={scaleDownCv}
             />
           )}
 
           <div
             ref={cardRef}
-            className="cvCard-main relative z-50 origin-center w-[480px] h-[800px]"
+            className={`cvCard-main relative origin-center w-[480px] h-[800px] ${scaledUp && 'z-2'}`}
             style={{ transform: 'scale(0.25)' }}
           >
             <div
-              className={`absolute inset-0 z-10 cursor-pointer ${scaledUp ? 'hidden' : 'block'}`}
+              className={`absolute inset-0 z-0 cursor-pointer ${scaledUp ? 'hidden' : 'block'}`}
               onClick={scaleUpCv}
             />
             <iframe
