@@ -4,25 +4,18 @@ import Card from './components/Card/Card'
 import Dealer from './components/Dealer/Dealer'
 import Dialogue from './components/Dialogue/Dialogue'
 import useBlackjack, { type CardData } from './hooks/useBlackjack'
+import Overlay from './components/Overlay/Overlay'
 
 function App() {
   let bj = useBlackjack();
-  // const initialHandGiven = useRef(false);
-
-  // useEffect(() => {
-  //   if (!initialHandGiven.current) {
-  //     bj.givePlayerHand();
-  //     bj.giveDealerHand();
-  //     initialHandGiven.current = true;
-  //   }
-  // }, []);
 
   useEffect(() => {
     bj.blackjackTickGame();
-  }, [bj.dealerHand, bj.playerHand, bj.playerState, bj.dealerPlaying]);
+  }, [bj.dealerHand, bj.playerHand, bj.playerState]);
 
   return (
     <div className='board-main'>
+      <Overlay ref={bj.overlayAnimator.overlayRef}/>
       {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut}/>}
       {/* Dealer side */}
       <div className='board-side'>
@@ -43,7 +36,6 @@ function App() {
           return (<Card ref={lastCard ? bj.dealerAnimator.playerSpotRef : null} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />);
         })}
       </div>
-
     </div>
   )
 }

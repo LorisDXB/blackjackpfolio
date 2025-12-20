@@ -2,6 +2,7 @@ import React, { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { useDealerAnimator } from './useDealerAnimation';
 import { sleep } from '../utility/utility';
 import { useDialogue } from './useDialogue';
+import { useOverlay } from './useOverlay';
 
 export type CardData = {
     hidden: boolean;
@@ -17,6 +18,7 @@ export enum PlayerState {
 
 export default function useBlackjack() {
     const dealerDialogue = useDialogue();
+    const overlayAnimator = useOverlay();
     //hands
     const [dealerHand, setDealerHand] = useState<CardData[]>([]);
     const [playerHand, setPlayerHand] = useState<CardData[]>([]);
@@ -48,7 +50,8 @@ export default function useBlackjack() {
         startDealerLogic(dealerAmount, playerAmount);
     }, [dealerPlaying])
 
-    function resetGame() {
+    async function resetGame() {
+        await overlayAnimator.fadeInOverlay();
         setDealerHand([]);
         setPlayerHand([]);
         setDealerState(PlayerState.NONE);
@@ -60,6 +63,7 @@ export default function useBlackjack() {
         givePlayerHand();
         dealerAnimator.resetAnimator();
         dealerDialogue.resetDialogue();
+        await overlayAnimator.fadeOutOverlay();
     }
 
     function generateCard(hiddenState: boolean) {
@@ -200,7 +204,8 @@ export default function useBlackjack() {
         }
 
         // if (dealerState == PlayerState.STANDING) {
-        if (playerState == PlayerState.STANDING && !dealerOccupied.current && dealerAmount > playerAmount) {
+        console.log("caca");
+        if (playerState == PlayerState.STANDING && !dealerOccupied.current && dealerAmount >= playerAmount) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
             setPlayerState(PlayerState.WINNER);
@@ -223,6 +228,7 @@ export default function useBlackjack() {
         blackjackTickGame,
         dealerAnimator,
         dealerPlaying,
-        dealerDialogue
+        dealerDialogue,
+        overlayAnimator
     };
 }
