@@ -1,6 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import "../components/Dealer/Dealer.css"
 import { sleep } from "../utility/utility";
+import dealerIdle from '../assets/dealer-idle.png';
+import dealerGrab from '../assets/dealer-grab.png';
+import dealerTwitch from '../assets/dealer-twitch.png';
+
+export enum DealerAnimState {
+    IDLE,
+    GRAB,
+    TWITCH
+}
+
+const DEALER_IMAGES: Record<DealerAnimState, string> = {
+    [DealerAnimState.IDLE]: `url(${dealerIdle})`,
+    [DealerAnimState.GRAB]: `url(${dealerGrab})`,
+    [DealerAnimState.TWITCH]: `url(${dealerTwitch})`,
+};
 
 enum DealerAnimation {
     IDLE,
@@ -17,9 +32,11 @@ export function useDealerAnimator(dealerPlaying: boolean) {
     const dealerSpotRef = useRef<HTMLDivElement | null>(null); // set when card needs to be given
     // const dealerOccupied = useRef<boolean>(false);
     const lastTransform = useRef<{ dx: number; dy: number } | null>(null);
+    const twitchTimeout = useRef<number | null>(null);
 
     useEffect(() => {
         playDefaultAnimation();
+        startRandomTwitching();
     }, []);
 
     function resetAnimator() {
@@ -62,11 +79,11 @@ export function useDealerAnimator(dealerPlaying: boolean) {
 
             // dealerOccupied.current = true;
             dealer.animate(
-              [
-                { transform: `translate(${t.dx}px, ${t.dy}px)` },
-                { transform: "translate(0, 0)" }
-              ],
-              { duration: 800, easing: "ease", fill: forward ? "forwards" : "none" }
+                [
+                    { transform: `translate(${t.dx}px, ${t.dy}px)` },
+                    { transform: "translate(0, 0)" }
+                ],
+                { duration: 800, easing: "ease", fill: forward ? "forwards" : "none" }
             ).onfinish = () => {
                 if (forward)
                     clearAnimations();
@@ -111,6 +128,54 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         });
     }
 
+    function setDealerImage(ref: React.RefObject<HTMLDivElement | null>, img: string) {
+        if (!ref.current) return;
+        ref.current.style.backgroundImage = `url(${img})`;
+    }
+
+    async function twitchDealer() {
+        if (!dealerRef.current) return;
+
+        setDealerImage(dealerRef, dealerTwitch);
+
+        const duration = Math.floor(Math.random() * 150) + 50; // 50–200ms
+        await sleep(duration);
+
+        setDealerImage(dealerRef, dealerIdle);
+    }
+
+    async function grabDealer() {
+        if (!dealerRef.current) return;
+
+        stopRandomTwitching();
+        setDealerImage(dealerRef, dealerGrab);
+        await sleep(100);
+        setDealerImage(dealerRef, dealerIdle);
+        startRandomTwitching();
+    }
+
+    function stopRandomTwitching() {
+        if (twitchTimeout.current !== null) {
+            clearTimeout(twitchTimeout.current);
+            twitchTimeout.current = null;
+        }
+    }
+
+    function startRandomTwitching() {
+        stopRandomTwitching(); // safety
+
+        const schedule = async () => {
+            const delay = Math.random() * 3000 + 500; // 2–6 seconds
+            twitchTimeout.current = window.setTimeout(async () => {
+                await twitchDealer();
+                schedule(); // schedule next one
+            }, delay);
+        };
+
+        schedule();
+    }
+
+
     return {
         dealerRef,
         playDefaultAnimation,
@@ -119,6 +184,8 @@ export function useDealerAnimator(dealerPlaying: boolean) {
         // dealerOccupied,
         dealerSpotRef,
         playerSpotRef,
-        resetAnimator
+        resetAnimator,
+        grabDealer,
+        twitchDealer
     }
 }

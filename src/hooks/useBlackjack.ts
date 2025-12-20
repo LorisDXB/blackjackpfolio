@@ -34,15 +34,16 @@ export default function useBlackjack() {
     const [dealerAmount, setDealerAmount] = useState<number>(0);
     const [playerAmount, setPlayerAmount] = useState<number>(0);
 
-  const initialHandGiven = useRef(false);
+    const initialHandGiven = useRef(false);
+    const isResetting = useRef(false);
 
-  useEffect(() => {
-    if (!initialHandGiven.current) {
-      givePlayerHand();
-      giveDealerHand();
-      initialHandGiven.current = true;
-    }
-  }, []);
+    useEffect(() => {
+        if (!initialHandGiven.current) {
+            givePlayerHand();
+            giveDealerHand();
+            initialHandGiven.current = true;
+        }
+    }, []);
 
     useEffect(() => {
         if (!dealerPlaying) return;
@@ -51,6 +52,9 @@ export default function useBlackjack() {
     }, [dealerPlaying])
 
     async function resetGame() {
+        if(isResetting.current) return;
+
+        isResetting.current = true;
         await overlayAnimator.fadeInOverlay();
         setDealerHand([]);
         setPlayerHand([]);
@@ -64,6 +68,7 @@ export default function useBlackjack() {
         dealerAnimator.resetAnimator();
         dealerDialogue.resetDialogue();
         await overlayAnimator.fadeOutOverlay();
+        isResetting.current = false;
     }
 
     function generateCard(hiddenState: boolean) {
@@ -100,6 +105,7 @@ export default function useBlackjack() {
         dealerOccupied.current = true;
         await dealerDialogue.writeMessage("Hit ? Odd choice");
         await dealerAnimator.playGiveCardAnimation();
+        dealerAnimator.grabDealer();
         giveCard(setPlayerHand)
         dealerOccupied.current = false; // I put this here instead of after the return anim
         // because it causes a bug where it sets dealerOccupied.false when the ticklogic needs it on
@@ -133,10 +139,12 @@ export default function useBlackjack() {
             if (newHand[0]) newHand[0].hidden = false;
             return newHand;
         });
+        dealerAnimator.grabDealer();
 
         await dealerAnimator.playGiveCardAnimation(true);
         while (dealerAmount < playerAmount) {
-            dealerAmount += giveCard(setDealerHand)
+            dealerAmount += giveCard(setDealerHand);
+            dealerAnimator.grabDealer();
             await sleep(500);
         }
         await dealerAnimator.playReturnAnimation(true);
@@ -149,6 +157,8 @@ export default function useBlackjack() {
     }
 
     async function blackjackTickGame() {
+        if (dealerOccupied.current) return;
+
         let dealerAmount = dealerHand.reduce((accumulator, d) => {
             return accumulator + d.typeId;
         }, 0);
@@ -162,15 +172,16 @@ export default function useBlackjack() {
         if (dealerAmount > 21) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("DANG IT, I went over...")
-            setDealerState(PlayerState.BUSTED);
+            // setDealerState(PlayerState.BUSTED);
             resetGame();
             dealerOccupied.current = false;
             return;
         }
         if (playerAmount > 21) {
+            console.log("test");
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Ahahah! How unfortunate, that's a bust.")
-            setPlayerState(PlayerState.BUSTED);
+            // setPlayerState(PlayerState.BUSTED);
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -180,7 +191,7 @@ export default function useBlackjack() {
         if (dealerAmount == 21) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, blackjack.")
-            setDealerState(PlayerState.WINNER);
+            // setDealerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -188,7 +199,7 @@ export default function useBlackjack() {
         if (playerAmount == 21) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("BLACKJACK! Nice one.")
-            setPlayerState(PlayerState.WINNER);
+            // setPlayerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -208,11 +219,12 @@ export default function useBlackjack() {
         if (playerState == PlayerState.STANDING && !dealerOccupied.current && dealerAmount >= playerAmount) {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
-            setPlayerState(PlayerState.WINNER);
+            // setPlayerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
         }
     }
+
 
     return {
         dealerHand,
