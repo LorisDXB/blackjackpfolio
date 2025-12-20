@@ -6,6 +6,7 @@ import Dialogue from './components/Dialogue/Dialogue'
 import useBlackjack, { type CardData } from './hooks/useBlackjack'
 import Overlay from './components/Overlay/Overlay'
 import CvCard from './components/CvCard/CvCard'
+import texture from './assets/texture.jpg'
 
 function App() {
   let bj = useBlackjack();
@@ -16,6 +17,7 @@ function App() {
 
   return (
     <div className='board-main'>
+      <img src={texture} className='texture-main'/>
       <Overlay ref={bj.overlayAnimator.overlayRef}/>
       <Dealer ref={bj.dealerAnimator.dealerRef} />
       {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut}/>}

@@ -7,3 +7,7 @@
 .board-side {
     @apply flex gap-5 justify-center items-center w-full h-1/3 border-2 border-green-700
 }
+
+.texture-main {
+    @apply absolute w-full h-full object-cover -z-1
+}
