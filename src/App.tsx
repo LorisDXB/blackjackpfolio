@@ -5,6 +5,7 @@ import Dealer from './components/Dealer/Dealer'
 import Dialogue from './components/Dialogue/Dialogue'
 import useBlackjack, { type CardData } from './hooks/useBlackjack'
 import Overlay from './components/Overlay/Overlay'
+import CvCard from './components/CvCard/CvCard'
 
 function App() {
   let bj = useBlackjack();
@@ -23,6 +24,10 @@ function App() {
         {bj.dealerHand.map((d: CardData, index) => (
           <Card ref={bj.dealerAnimator.dealerSpotRef} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />
         ))}
+      </div>
+
+      <div className='board-side'>
+        <CvCard />
       </div>
 
       {/* Player side */}
