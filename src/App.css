@@ -1,14 +1,14 @@
 @reference "tailwindcss";
 
 .board-main {
-    @apply flex flex-col justify-between items-center h-screen w-screen;
+    @apply flex flex-col justify-between items-center min-h-screen w-screen;
     background-image: url('./assets/texture.jpg');
     background-repeat: repeat;
     background-size: 100%; /* adjust to taste */
 }
 
 .board-side {
-    @apply flex gap-5 justify-center items-center w-full h-1/3 border
+    @apply flex gap-5 justify-center items-center w-full min-h-[33vh] border
 }
 
 .texture-main {
