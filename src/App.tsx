@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import './App.css'
 import Card from './components/Card/Card'
 import Dealer from './components/Dealer/Dealer'
@@ -6,7 +6,6 @@ import Dialogue from './components/Dialogue/Dialogue'
 import useBlackjack, { type CardData } from './hooks/useBlackjack'
 import Overlay from './components/Overlay/Overlay'
 import CvCard from './components/CvCard/CvCard'
-import texture from './assets/texture.jpg'
 
 function App() {
   let bj = useBlackjack();

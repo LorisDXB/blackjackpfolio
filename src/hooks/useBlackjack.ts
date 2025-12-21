@@ -1,4 +1,4 @@
-import React, { useEffect, useEffectEvent, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDealerAnimator } from './useDealerAnimation';
 import { sleep } from '../utility/utility';
 import { useDialogue } from './useDialogue';

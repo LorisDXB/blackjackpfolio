@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import "../components/Dealer/Dealer.css"
 import { sleep } from "../utility/utility";
 import dealerIdle from '../assets/dealer-idle.png';
@@ -10,17 +10,6 @@ export enum DealerAnimState {
     GRAB,
     TWITCH
 }
-
-const DEALER_IMAGES: Record<DealerAnimState, string> = {
-    [DealerAnimState.IDLE]: `url(${dealerIdle})`,
-    [DealerAnimState.GRAB]: `url(${dealerGrab})`,
-    [DealerAnimState.TWITCH]: `url(${dealerTwitch})`,
-};
-
-enum DealerAnimation {
-    IDLE,
-    GIVINGCARD
-};
 
 const cssDealerAnimationList = [
     "dealer-idle-anim",

@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react'
 import './Overlay.css'
 
 const Overlay = forwardRef<HTMLDivElement>((_, ref) => {

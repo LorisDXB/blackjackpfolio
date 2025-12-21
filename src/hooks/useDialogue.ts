@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { sleep } from "../utility/utility";
 
 enum MessageState {
