@@ -3,7 +3,7 @@ import './Overlay.css'
 
 const Overlay = forwardRef<HTMLDivElement>((_, ref) => {
   return (
-    <div ref={ref} className='overlay-main'>Overlay</div>
+    <div ref={ref} className='overlay-main'></div>
   )
 });
 

@@ -39,11 +39,21 @@ export default function useBlackjack() {
     const isResetting = useRef(false);
 
     useEffect(() => {
-        if (!initialHandGiven.current) {
-            givePlayerHand();
-            giveDealerHand();
-            initialHandGiven.current = true;
+        const x = async () => {
+            if (!initialHandGiven.current) {
+                givePlayerHand();
+                giveDealerHand();
+                initialHandGiven.current = true;
+                dealerOccupied.current = true;
+                await overlayAnimator.fadeOutOverlay();
+                await dealerDialogue.writeMessage("Let's play blackjack.");
+                await dealerDialogue.writeMessage("On your side, double click to hit, or click and drag your mouse over your cards to stand.", 1000);
+                await dealerDialogue.writeMessage("One more thing, the ace is always worth 1 here.", 1000);
+                dealerOccupied.current = false;
+            }
         }
+
+        x();
     }, []);
 
     useEffect(() => {
@@ -53,7 +63,7 @@ export default function useBlackjack() {
     }, [dealerPlaying])
 
     async function resetGame() {
-        if(isResetting.current) return;
+        if (isResetting.current) return;
 
         isResetting.current = true;
         await overlayAnimator.fadeInOverlay();

@@ -5,13 +5,12 @@
     background-image: url('./assets/texture.jpg');
     background-repeat: repeat;
     background-size: 100%;
-    /* adjust to taste */
 }
 
 .board-side {
-    @apply flex gap-5 justify-center items-center w-full min-h-[33vh] border
+    @apply flex gap-5 justify-center items-center w-full min-h-[33vh];
 }
 
 .texture-main {
-    @apply absolute w-full h-full object-cover -z-1 bg-repeat
+    @apply absolute w-full h-full object-cover -z-1 bg-repeat;
 }
