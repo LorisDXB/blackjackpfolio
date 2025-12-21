@@ -138,8 +138,9 @@ export default function useBlackjack() {
         if (standPosXStart < 0) return;
 
         let mousePos = e.clientX
+        const swipeThreshold = window.innerWidth * 0.3;
 
-        if (Math.abs(standPosXStart - mousePos) >= 300 && !dealerOccupied.current) // 300 is minimum for it to be a stand (magic number though)
+        if (Math.abs(standPosXStart - mousePos) >= swipeThreshold && !dealerOccupied.current) // 300 is minimum for it to be a stand (magic number though)
             setPlayerState(PlayerState.STANDING);
         setStandPosXStart(-1); // Reset
     }
