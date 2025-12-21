@@ -1,7 +1,7 @@
 @reference 'tailwindcss';
 
 .dealer-main {
-    @apply absolute left-0 md:left-[25%] top-[2%] w-40 h-40 z-1;
+    @apply absolute left-0 md:left-[25%] top-[2%] w-40 h-40 z-2;
     background-image: url("../../assets/dealer-idle.png");
     background-size: cover;
 }

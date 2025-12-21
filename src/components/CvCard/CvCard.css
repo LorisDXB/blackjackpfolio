@@ -1,5 +1,5 @@
 @reference "tailwindcss";
 
 .cvCard-main {
-    @apply flex flex-col items-center justify-center border-2 border-red-500
+    @apply flex flex-col items-center justify-center
 }

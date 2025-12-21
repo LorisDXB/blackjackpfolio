@@ -7,6 +7,10 @@ const CvCard = () => {
   const cardRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<Animation | null>(null)
 
+  function openCv() {
+    window.open(cv, "_blank");
+  }            
+
   function scaleUpCv() {
     if (!cardRef.current || scaledUp) return
 
@@ -27,7 +31,8 @@ const CvCard = () => {
     setScaledUp(true)
   }
 
-  function scaleDownCv() {
+  function scaleDownCv(event: React.MouseEvent) {
+    event.stopPropagation();
     if (!cardRef.current) return
 
     animationRef.current?.cancel()
@@ -53,7 +58,7 @@ const CvCard = () => {
         <div className="pointer-events-auto">
           {scaledUp && (
             <div
-              className="fixed inset-0 z-5"
+              className="fixed inset-0 z-0"
               onClick={scaleDownCv}
             />
           )}
@@ -71,6 +76,7 @@ const CvCard = () => {
               src={cv}
               className={`w-full h-full ${scaledUp ? 'pointer-events-auto' : 'pointer-events-none'}`}
             />
+            {scaledUp && (<button className='w-full' onClick={openCv}>Inspect the artifact</button>)}
           </div>
         </div>
       </div>

@@ -31,7 +31,7 @@ const getValueFromFilename = (filename: string): number => {
 // Populate the map
 Object.keys(cardImages).forEach((path) => {
     const value = getValueFromFilename(path);
-    const imageUrl = cardImages[path]; // This is the URL string because of as: 'url'
+    const imageUrl = cardImages[path];
 
     if (value > 0) {
         if (!cardMap[value]) {
@@ -39,6 +39,7 @@ Object.keys(cardImages).forEach((path) => {
         }
         cardMap[value].push(imageUrl);
     }
+    console.log(cardMap);
 });
 
 type CardProp = {
@@ -47,13 +48,6 @@ type CardProp = {
 };
 
 const Card = forwardRef<HTMLDivElement, CardProp>(({ hidden, typeId }, ref) => {
-    // Select a random card image for the given typeId
-    // We use useMemo to ensure the image doesn't change on re-renders, 
-    // but we use typeId as a dependency so different cards get different images (if logical identity changes)
-    // However, since typeId is just a number, if we have multiple 10s, we want them random.
-    // React's useMemo persists for the component instance. 
-    // If the parent renders list with stable keys, this component instance is stable.
-
     const cardImage = useMemo(() => {
         const potentialImages = cardMap[typeId];
         if (!potentialImages || potentialImages.length === 0) return null;

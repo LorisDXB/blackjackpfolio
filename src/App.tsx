@@ -17,12 +17,12 @@ function App() {
 
   return (
     <div className='board-main'>
-      <img src={texture} className='texture-main'/>
+      {/* <img src={texture} className='texture-main'/> */}
       <Overlay ref={bj.overlayAnimator.overlayRef}/>
       <Dealer ref={bj.dealerAnimator.dealerRef} />
       {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut}/>}
       {/* Dealer side */}
-      <div className='board-side'>
+      <div className='board-side flex-wrap-reverse'>
         {bj.dealerHand.map((d: CardData, index) => (
           <Card ref={bj.dealerAnimator.dealerSpotRef} key={`${d.typeId}-${index}`} hidden={d.hidden} typeId={d.typeId} />
         ))}
@@ -34,7 +34,7 @@ function App() {
       </div>
 
       {/* Player side */}
-      <div className='board-side'
+      <div className='board-side flex-wrap z-1'
         onDoubleClick={bj.hitLogic}
         onMouseDown={bj.standLogicStart}
         onMouseUp={bj.standLogicEnd}>
