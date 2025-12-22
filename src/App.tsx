@@ -27,7 +27,7 @@ function App() {
         ))}
       </div>
 
-      <div className='board-side border'>
+      <div className='board-side'>
         {bj.wonOnce ? (<CvCard />) : (<div ref={bj.dealerAnimator.cvSpotRef}
           className='w-20 h-20 border border-red-500 rotate-45'></div>)}
           <div className='absolute left-[65%] md:left-[60%] font-bold'>{`Streak: ${bj.streak}`}</div>
