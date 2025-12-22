@@ -3,5 +3,6 @@
 .dialogue-main {
     @apply fixed top-4/10 flex justify-center
         items-center w-4/5 md:w-3/5 h-3/10 border
-        border-red-700 rounded-xl z-2 bg-black/60 text-xl font-semibold text-white
+        border-red-700 rounded-xl z-2 bg-black/60 text-xl
+        font-semibold text-white p-5
 }

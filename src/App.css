@@ -9,6 +9,7 @@
 
 .board-side {
     @apply flex gap-5 justify-center items-center w-full min-h-[33vh];
+    touch-action: pan-y;
 }
 
 .texture-main {

@@ -17,9 +17,9 @@ function App() {
   return (
     <div className='board-main'>
       {/* <img src={texture} className='texture-main'/> */}
-      <Overlay ref={bj.overlayAnimator.overlayRef}/>
+      <Overlay ref={bj.overlayAnimator.overlayRef} />
       <Dealer ref={bj.dealerAnimator.dealerRef} />
-      {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut}/>}
+      {!bj.dealerDialogue.hidden && <Dialogue dialogue={bj.dealerDialogue.typedOut} />}
       {/* Dealer side */}
       <div className='board-side flex-wrap-reverse'>
         {bj.dealerHand.map((d: CardData, index) => (
@@ -27,16 +27,19 @@ function App() {
         ))}
       </div>
 
-      <div className='board-side'>
+      <div className='board-side border'>
         {bj.wonOnce ? (<CvCard />) : (<div ref={bj.dealerAnimator.cvSpotRef}
           className='w-20 h-20 border border-red-500 rotate-45'></div>)}
+          <div className='absolute left-[65%] md:left-[60%] font-bold'>{`Streak: ${bj.streak}`}</div>
       </div>
 
       {/* Player side */}
       <div className='board-side flex-wrap z-1'
         onDoubleClick={bj.hitLogic}
         onMouseDown={bj.standLogicStart}
-        onMouseUp={bj.standLogicEnd}>
+        onMouseUp={bj.standLogicEnd}
+        onTouchStart={bj.standLogicStart}
+        onTouchEnd={bj.standLogicEnd}>
         {bj.playerHand.map((d: CardData, index) => {
           const lastCard = index == bj.playerHand.length - 1;
 

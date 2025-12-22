@@ -35,6 +35,8 @@ export default function useBlackjack() {
     const [dealerAmount, setDealerAmount] = useState<number>(0);
     const [playerAmount, setPlayerAmount] = useState<number>(0);
 
+    const [streak, setStreak] = useState<number>(0);
+
     const initialHandGiven = useRef(false);
     const isResetting = useRef(false);
 
@@ -126,18 +128,25 @@ export default function useBlackjack() {
     // stand logic
     const [standPosXStart, setStandPosXStart] = useState<number>(-1);
 
-    function standLogicStart(e: React.MouseEvent) {
+    function getClientX(e: React.MouseEvent | React.TouchEvent): number {
+        if ('touches' in e) {
+            return e.changedTouches[0].clientX;
+        }
+        return (e as React.MouseEvent).clientX;
+    }
+
+    function standLogicStart(e: React.MouseEvent | React.TouchEvent) {
         if (playerState != PlayerState.NONE) return;
 
-        let mousePos = e.clientX
+        let mousePos = getClientX(e);
 
         setStandPosXStart(mousePos);
     }
 
-    function standLogicEnd(e: React.MouseEvent) {
+    function standLogicEnd(e: React.MouseEvent | React.TouchEvent) {
         if (standPosXStart < 0) return;
 
-        let mousePos = e.clientX
+        let mousePos = getClientX(e);
         const swipeThreshold = window.innerWidth * 0.3;
 
         if (Math.abs(standPosXStart - mousePos) >= swipeThreshold && !dealerOccupied.current) // 300 is minimum for it to be a stand (magic number though)
@@ -197,6 +206,7 @@ export default function useBlackjack() {
             await dealerDialogue.writeMessage("DANG IT, I went over...")
             // setDealerState(PlayerState.BUSTED);
             await giveCv();
+            setStreak((d) => d + 1);
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -206,6 +216,7 @@ export default function useBlackjack() {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Ahahah! How unfortunate, that's a bust.")
             // setPlayerState(PlayerState.BUSTED);
+            setStreak(0);
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -216,6 +227,7 @@ export default function useBlackjack() {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, blackjack.")
             // setDealerState(PlayerState.WINNER);
+            setStreak(0);
             resetGame();
             dealerOccupied.current = false;
             return;
@@ -224,6 +236,7 @@ export default function useBlackjack() {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("BLACKJACK! Nice one.")
             await giveCv();
+            setStreak((d) => d + 1);
             // setPlayerState(PlayerState.WINNER);
             resetGame();
             dealerOccupied.current = false;
@@ -245,6 +258,7 @@ export default function useBlackjack() {
             dealerOccupied.current = true;
             await dealerDialogue.writeMessage("Looks like you're out of luck, better luck next time ahah")
             // setPlayerState(PlayerState.WINNER);
+            setStreak(0);
             resetGame();
             dealerOccupied.current = false;
         }
@@ -267,6 +281,7 @@ export default function useBlackjack() {
         dealerPlaying,
         dealerDialogue,
         overlayAnimator,
-        wonOnce
+        wonOnce,
+        streak
     };
 }
